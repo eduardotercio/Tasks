@@ -1,4 +1,4 @@
-package com.example.tasks.view.viewholder
+package com.example.tasks.ui.view.viewholder
 
 import android.app.AlertDialog
 import android.view.View

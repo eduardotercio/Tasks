@@ -1,14 +1,13 @@
-package com.example.tasks.view
+package com.example.tasks.ui.view
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.view.View
 import androidx.lifecycle.ViewModelProvider
-import com.example.tasks.R
 import com.example.tasks.databinding.ActivityTaskFormBinding
-import com.example.tasks.viewmodel.RegisterViewModel
-import com.example.tasks.viewmodel.TaskFormViewModel
+import com.example.tasks.ui.viewmodel.TaskFormViewModel
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class TaskFormActivity : AppCompatActivity() {
 
     private lateinit var mViewModel: TaskFormViewModel

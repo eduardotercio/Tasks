@@ -9,8 +9,14 @@
         <entry key="..\:/Backup/code/Android/Aprendizado/Apps UdemyKotlinAndroid/Apps/TasksTemplate/app/src/main/res/layout/activity_task_form.xml" value="0.22" />
         <entry key="..\:/Backup/code/Android/Aprendizado/Apps UdemyKotlinAndroid/Apps/TasksTemplate/app/src/main/res/layout/content_main.xml" value="0.182518115942029" />
         <entry key="..\:/Backup/code/Android/Aprendizado/Apps UdemyKotlinAndroid/Apps/TasksTemplate/app/src/main/res/layout/fragment_all_tasks.xml" value="0.182518115942029" />
+        <entry key="..\:/Backup/code/Android/Aprendizado/AppsIntermediariosTestes/Tasks/app/src/main/res/layout/activity_login.xml" value="0.1" />
       </map>
     </option>
+  </component>
+  <component name="EntryPointsManager">
+    <list size="1">
+      <item index="0" class="java.lang.String" itemvalue="dagger.Provides" />
+    </list>
   </component>
   <component name="ExternalStorageConfigurationManager" enabled="true" />
   <component name="ProjectRootManager" version="2" languageLevel="JDK_11" project-jdk-name="1.8" project-jdk-type="JavaSDK">

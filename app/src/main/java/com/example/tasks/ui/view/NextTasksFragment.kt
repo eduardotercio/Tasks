@@ -1,4 +1,4 @@
-package com.example.tasks.view
+package com.example.tasks.ui.view
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -7,8 +7,10 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.example.tasks.R
-import com.example.tasks.viewmodel.NextTasksViewModel
+import com.example.tasks.ui.viewmodel.NextTasksViewModel
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class NextTasksFragment : Fragment() {
 
     private lateinit var mViewModel: NextTasksViewModel

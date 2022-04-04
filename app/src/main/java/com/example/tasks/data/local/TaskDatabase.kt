@@ -1,4 +1,4 @@
-package com.example.tasks.data.repository.local
+package com.example.tasks.data.local
 
 import android.content.Context
 import androidx.room.Room

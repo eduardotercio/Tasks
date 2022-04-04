@@ -1,4 +1,4 @@
-package com.example.tasks.data.repository.local
+package com.example.tasks.data.local
 
 import android.content.Context
 import android.content.SharedPreferences
@@ -6,7 +6,7 @@ import android.content.SharedPreferences
 /**
  * Acesso a dados rápidos do projeto - SharedPreferences
  */
-class SecurityPreferences(context: Context) {
+class SecurityPreference(context: Context) {
 
     private val mPreferences: SharedPreferences =
         context.getSharedPreferences("taskShared", Context.MODE_PRIVATE)

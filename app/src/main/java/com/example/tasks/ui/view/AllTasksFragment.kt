@@ -1,4 +1,4 @@
-package com.example.tasks.view
+package com.example.tasks.ui.view
 
 import android.content.Intent
 import android.os.Bundle
@@ -10,11 +10,13 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.tasks.R
-import com.example.tasks.data.constants.TaskConstants
+import com.example.tasks.constants.TaskConstants
 import com.example.tasks.data.listener.TaskListener
-import com.example.tasks.view.adapter.TaskAdapter
-import com.example.tasks.viewmodel.AllTasksViewModel
+import com.example.tasks.ui.view.adapter.TaskAdapter
+import com.example.tasks.ui.viewmodel.AllTasksViewModel
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class AllTasksFragment : Fragment() {
 
     private lateinit var mViewModel: AllTasksViewModel

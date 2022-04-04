@@ -1,4 +1,4 @@
-package com.example.tasks.data.constants
+package com.example.tasks.constants
 
 /**
  * Constantes usadas na aplicação

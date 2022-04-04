@@ -1,11 +1,11 @@
-package com.example.tasks.view.adapter
+package com.example.tasks.ui.view.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.example.tasks.R
 import com.example.tasks.data.listener.TaskListener
-import com.example.tasks.view.viewholder.TaskViewHolder
+import com.example.tasks.ui.view.viewholder.TaskViewHolder
 
 class TaskAdapter : RecyclerView.Adapter<TaskViewHolder>() {
 

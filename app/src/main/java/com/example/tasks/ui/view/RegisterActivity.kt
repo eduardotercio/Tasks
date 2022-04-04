@@ -1,12 +1,21 @@
-package com.example.tasks.view
+package com.example.tasks.ui.view
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.widget.Toast
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
-import com.example.tasks.R
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import com.example.tasks.databinding.ActivityRegisterBinding
-import com.example.tasks.viewmodel.RegisterViewModel
+import com.example.tasks.ui.state.ResourceState
+import com.example.tasks.ui.viewmodel.RegisterViewModel
+import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 
+@AndroidEntryPoint
 class RegisterActivity : AppCompatActivity() {
 
     private lateinit var mViewModel: RegisterViewModel
@@ -22,8 +31,8 @@ class RegisterActivity : AppCompatActivity() {
         mViewModel = ViewModelProvider(this).get(RegisterViewModel::class.java)
 
         // Inicializa eventos
+        collector()
         setClickListeners()
-        observe()
     }
 
     override fun onDestroy() {
@@ -31,8 +40,19 @@ class RegisterActivity : AppCompatActivity() {
         super.onDestroy()
     }
 
-    private fun observe() {
-
+    private fun collector() = lifecycleScope.launch {
+        repeatOnLifecycle(Lifecycle.State.STARTED){
+            mViewModel.create.collectLatest {
+                when (it) {
+                    is ResourceState.Sucess -> {
+                        startActivity(Intent(this@RegisterActivity, MainActivity::class.java))
+                    }
+                    is ResourceState.Error -> {
+                        Toast.makeText(this@RegisterActivity, "${it.message}", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            }
+        }
     }
 
     private fun setClickListeners() {
