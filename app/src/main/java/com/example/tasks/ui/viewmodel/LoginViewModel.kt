@@ -1,27 +1,27 @@
 package com.example.tasks.ui.viewmodel
 
 import android.app.Application
-import android.content.SharedPreferences
 import android.util.Log
-import com.example.tasks.constants.TaskConstants.SHARED
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.tasks.data.model.HeaderModel
-import com.example.tasks.repository.UserRepository
+import com.example.tasks.repository.AuthRepository
+import com.example.tasks.repository.PriorityRepository
 import com.example.tasks.ui.state.ResourceState
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import retrofit2.Response
-import java.io.IOException
 import javax.inject.Inject
 
 
 @HiltViewModel
 class LoginViewModel @Inject constructor(
     application: Application,
-    private val repository: UserRepository,
+    private val authRepository: AuthRepository,
+    private val priorityRepository: PriorityRepository
 ) : ViewModel() {
 
     private val mLogin =
@@ -34,6 +34,8 @@ class LoginViewModel @Inject constructor(
     private val mPassoword = MutableStateFlow<String>("")
     val password = mPassoword.asStateFlow()
 
+    private val mToast = MutableSharedFlow<String>()
+    val toast = mToast.asSharedFlow()
 
     fun updateFields(email: String?, password: String?) {
         mEmail.value = email.toString()
@@ -46,9 +48,11 @@ class LoginViewModel @Inject constructor(
     fun doLogin(email: String, password: String) {
         viewModelScope.launch {
             try {
-                mLogin.value = repository.login(email, password)
+                mLogin.value = authRepository.login(email, password)
             } catch (t: Throwable) {
                 Log.e("ErrorLoginVM", t.message.toString())
+            } finally {
+                mToast.emit(mLogin.value.message ?: "Preencha os campos.")
             }
         }
     }
@@ -56,6 +60,16 @@ class LoginViewModel @Inject constructor(
     /**
      * Verifica se usuário está logado
      */
-    fun userIsLogged() = repository.isLogged()
+    fun userIsLogged(): Boolean {
+        val logged = authRepository.isLogged()
+        viewModelScope.launch {
+            withContext(Dispatchers.IO){
+                if(!logged){
+                    priorityRepository.getPriorityList()
+                }
+            }
+        }
+        return logged
+    }
 
 }

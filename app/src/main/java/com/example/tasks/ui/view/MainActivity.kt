@@ -1,5 +1,6 @@
 package com.example.tasks.ui.view
 
+import android.content.Intent
 import android.os.Bundle
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.Snackbar
@@ -12,6 +13,7 @@ import androidx.core.view.GravityCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.ui.*
 import com.example.tasks.R
+import com.example.tasks.databinding.ActivityMainBinding
 import com.example.tasks.ui.viewmodel.MainViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -21,19 +23,24 @@ class MainActivity : AppCompatActivity() {
     private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var mViewModel: MainViewModel
 
+    private var _binding: ActivityMainBinding? = null
+    private val binding get() = _binding!!
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        _binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
         mViewModel = ViewModelProvider(this).get(MainViewModel::class.java)
+
+        binding.drawerLayout
 
         val toolbar: Toolbar = findViewById(R.id.toolbar)
         setSupportActionBar(toolbar)
 
         val fab: FloatingActionButton = findViewById(R.id.fab)
-        fab.setOnClickListener { view ->
-            Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                .setAction("Action", null).show()
+        fab.setOnClickListener {
+            startActivity(Intent(this, TaskFormActivity::class.java))
         }
 
         // Navegação
@@ -67,6 +74,7 @@ class MainActivity : AppCompatActivity() {
         navView.setNavigationItemSelectedListener {
             if (it.itemId == R.id.nav_logout) {
                 mViewModel.logout()
+                startActivity(Intent(this, LoginActivity::class.java))
                 finish()
             } else {
                 NavigationUI.onNavDestinationSelected(it, navController)

@@ -2,7 +2,12 @@ package com.example.tasks.di
 
 import android.content.Context
 import android.content.SharedPreferences
-import com.example.tasks.data.remote.UserServiceAPI
+import androidx.room.Room
+import com.example.tasks.constants.TaskConstants.DATABASE.DATABASE_NAME
+import com.example.tasks.data.local.AppDatabase
+import com.example.tasks.data.remote.AuthServiceAPI
+import com.example.tasks.data.remote.PrioritySerivceAPI
+import com.example.tasks.data.remote.TaskServiceAPI
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -18,12 +23,25 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 object Module {
 
+    // Dependências para o Room
+    @Singleton
+    @Provides
+    fun provideAppDatabase(
+        @ApplicationContext context: Context
+    ) = Room.databaseBuilder(context, AppDatabase::class.java, DATABASE_NAME).build()
+
+    @Singleton
+    @Provides
+    fun providePriorityDAO(database: AppDatabase) = database.priorityDao()
+
+    // Dependência para o Shared Preferences
     @Singleton
     @Provides
     fun provideSharedPreferences(
         @ApplicationContext context: Context
     ): SharedPreferences = context.getSharedPreferences("taskShared", Context.MODE_PRIVATE)
 
+    // Dependências para o Retrofit e requisições API
     @Singleton
     @Provides
     fun provideOkHttpClient(): OkHttpClient {
@@ -55,8 +73,20 @@ object Module {
 
     @Singleton
     @Provides
-    fun provideServiceApi(retrofit: Retrofit): UserServiceAPI {
-        return retrofit.create(UserServiceAPI::class.java)
+    fun provideAuthServiceApi(retrofit: Retrofit): AuthServiceAPI {
+        return retrofit.create(AuthServiceAPI::class.java)
+    }
+
+    @Singleton
+    @Provides
+    fun providePriotiryServiceApi(retrofit: Retrofit): PrioritySerivceAPI {
+        return retrofit.create(PrioritySerivceAPI::class.java)
+    }
+
+    @Singleton
+    @Provides
+    fun provideTaskServiceApi(retrofit: Retrofit): TaskServiceAPI {
+        return retrofit.create(TaskServiceAPI::class.java)
     }
 
 }

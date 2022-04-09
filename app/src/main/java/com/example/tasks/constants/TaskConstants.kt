@@ -5,6 +5,11 @@ package com.example.tasks.constants
  */
 class TaskConstants private constructor() {
 
+    // Room
+    object DATABASE {
+        const val DATABASE_NAME = "task.db"
+    }
+
     // SharedPreferences
     object SHARED {
         const val TOKEN_KEY = "tokenkey"

@@ -12,6 +12,7 @@ import com.example.tasks.databinding.ActivityLoginBinding
 import com.example.tasks.ui.state.ResourceState
 import com.example.tasks.ui.viewmodel.LoginViewModel
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -68,7 +69,7 @@ class LoginActivity : AppCompatActivity() {
      */
     private fun verifyLoggedUser() {
         if (mViewModel.userIsLogged()) {
-            startActivity(Intent(this,MainActivity::class.java))
+            startActivity(Intent(this, MainActivity::class.java))
             finish()
         }
     }
@@ -85,13 +86,14 @@ class LoginActivity : AppCompatActivity() {
                         Timber.tag("LoginActivity").i("Login feito com sucesso!")
                         finish()
                     }
-                    is ResourceState.Error -> {
-                        Toast.makeText(this@LoginActivity, "${it.message}", Toast.LENGTH_SHORT)
-                            .show()
+                    else -> {
+                        mViewModel.toast.collect { message ->
+                            Toast.makeText(this@LoginActivity, message, Toast.LENGTH_SHORT).show()
+                        }
                     }
-                    else -> {}
                 }
             }
+
             mViewModel.email.collectLatest {
                 binding.editEmail.setText(it)
             }

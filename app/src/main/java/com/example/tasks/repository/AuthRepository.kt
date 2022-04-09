@@ -3,14 +3,14 @@ package com.example.tasks.repository
 import android.content.SharedPreferences
 import com.example.tasks.constants.TaskConstants.SHARED
 import com.example.tasks.data.model.HeaderModel
-import com.example.tasks.data.remote.UserServiceAPI
+import com.example.tasks.data.remote.AuthServiceAPI
 import com.example.tasks.ui.state.ResourceState
 import com.google.gson.Gson
 import retrofit2.Response
 import javax.inject.Inject
 
-class UserRepository @Inject constructor(
-    private val apiUser: UserServiceAPI,
+class AuthRepository @Inject constructor(
+    private val apiAuth: AuthServiceAPI,
     private val shared: SharedPreferences
 ) {
 
@@ -19,7 +19,7 @@ class UserRepository @Inject constructor(
         email: String,
         password: String
     ): ResourceState<Response<HeaderModel>> {
-        val response = apiUser.createUser(name, email, password)
+        val response = apiAuth.createUser(name, email, password)
         return if (response.isSuccessful) {
             save(response)
             ResourceState.Sucess(response)
@@ -30,7 +30,7 @@ class UserRepository @Inject constructor(
     }
 
     suspend fun login(email: String, password: String): ResourceState<Response<HeaderModel>> {
-        val response = apiUser.login(email, password)
+        val response = apiAuth.login(email, password)
         return if (response.isSuccessful) {
             save(response)
             ResourceState.Sucess(response)
@@ -40,6 +40,16 @@ class UserRepository @Inject constructor(
         }
     }
 
+    // Verifica se o usuário está logado
+    fun isLogged(): Boolean {
+        val token = shared.getString(SHARED.TOKEN_KEY, "") ?: ""
+        val key = shared.getString(SHARED.PERSON_KEY, "") ?: ""
+
+        return (token != "" && key != "")
+    }
+
+    // Se Não estiver logado, salva os dados retornados da API no shared,
+    // para usar como Header posteriormente
     private fun save(response: Response<HeaderModel>) {
         if (!isLogged()) {
             response.body()?.let { header ->
@@ -50,13 +60,7 @@ class UserRepository @Inject constructor(
         }
     }
 
-    fun isLogged(): Boolean {
-        val token = shared.getString(SHARED.TOKEN_KEY, "") ?: ""
-        val key = shared.getString(SHARED.PERSON_KEY, "") ?: ""
-
-        return (token != "" && key != "")
-    }
-
+    // Chamada para deletar os dados do Header, assim deslogando o usuário
     fun delete() {
         shared.edit().remove(SHARED.TOKEN_KEY).apply()
         shared.edit().remove(SHARED.PERSON_KEY).apply()
