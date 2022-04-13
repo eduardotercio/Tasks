@@ -5,6 +5,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.tasks.data.model.HeaderModel
+import com.example.tasks.data.model.PriorityModel
 import com.example.tasks.repository.AuthRepository
 import com.example.tasks.repository.PriorityRepository
 import com.example.tasks.ui.state.ResourceState
@@ -14,6 +15,7 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import retrofit2.Response
+import java.io.IOException
 import javax.inject.Inject
 
 
@@ -28,19 +30,23 @@ class LoginViewModel @Inject constructor(
         MutableStateFlow<ResourceState<Response<HeaderModel>>>(ResourceState.Empty())
     val login = mLogin.asStateFlow()
 
-    private val mEmail = MutableStateFlow<String>("")
-    val email = mEmail.asStateFlow()
+    private val mPriorityList =
+        MutableStateFlow<ResourceState<Response<List<PriorityModel>>>>(ResourceState.Empty())
+    val priorityList = mPriorityList.asStateFlow()
 
-    private val mPassoword = MutableStateFlow<String>("")
-    val password = mPassoword.asStateFlow()
+//    private val mEmail = MutableStateFlow<String>("")
+//    val email = mEmail.asStateFlow()
+//
+//    private val mPassoword = MutableStateFlow<String>("")
+//    val password = mPassoword.asStateFlow()
 
     private val mToast = MutableSharedFlow<String>()
     val toast = mToast.asSharedFlow()
 
-    fun updateFields(email: String?, password: String?) {
-        mEmail.value = email.toString()
-        mPassoword.value = password.toString()
-    }
+//    fun updateFields(email: String?, password: String?) {
+//        mEmail.value = email.toString()
+//        mPassoword.value = password.toString()
+//    }
 
     /**
      * Faz login usando API
@@ -48,11 +54,20 @@ class LoginViewModel @Inject constructor(
     fun doLogin(email: String, password: String) {
         viewModelScope.launch {
             try {
+                priorityRepository.setPriorityList()
                 mLogin.value = authRepository.login(email, password)
             } catch (t: Throwable) {
+                if (email == "" || password == "") {
+                    mToast.emit(mLogin.value.message ?: "Preencha todos os campos.")
+                } else {
+                    mToast.emit(mLogin.value.message ?: "Falha na conexão.")
+                }
+
                 Log.e("ErrorLoginVM", t.message.toString())
             } finally {
-                mToast.emit(mLogin.value.message ?: "Preencha os campos.")
+                if (email != "" && password != "") {
+                    mToast.emit(mLogin.value.message ?: "Falha na conexão.")
+                }
             }
         }
     }
@@ -60,16 +75,6 @@ class LoginViewModel @Inject constructor(
     /**
      * Verifica se usuário está logado
      */
-    fun userIsLogged(): Boolean {
-        val logged = authRepository.isLogged()
-        viewModelScope.launch {
-            withContext(Dispatchers.IO){
-                if(!logged){
-                    priorityRepository.getPriorityList()
-                }
-            }
-        }
-        return logged
-    }
+    fun userIsLogged() = authRepository.isLogged()
 
 }

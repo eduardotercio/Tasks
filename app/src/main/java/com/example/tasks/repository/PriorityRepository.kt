@@ -13,16 +13,14 @@ class PriorityRepository @Inject constructor(
     private val daoPriority: PriorityDAO
 ) {
 
-    suspend fun getPriorityList(): ResourceState<Response<List<PriorityModel>>> {
+    suspend fun setPriorityList() {
         val response = apiPriority.priorityList()
-        return if (response.isSuccessful){
+        if (response.isSuccessful) {
             daoPriority.clear()
             daoPriority.insert(response.body()!!)
-            ResourceState.Sucess(response)
-        } else {
-            val message = Gson().fromJson(response.errorBody()!!.charStream(), String::class.java)
-            ResourceState.Error(message)
         }
     }
+
+    suspend fun list() = daoPriority.list()
 
 }

@@ -11,6 +11,7 @@ import androidx.lifecycle.repeatOnLifecycle
 import com.example.tasks.databinding.ActivityLoginBinding
 import com.example.tasks.ui.state.ResourceState
 import com.example.tasks.ui.viewmodel.LoginViewModel
+import com.example.tasks.util.collectLatestStateFlow
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.collectLatest
@@ -36,21 +37,24 @@ class LoginActivity : AppCompatActivity() {
         collector()
         setClickListeners();
 
+        // Mantém os dados dos campos
+        //updateFields()
+
         // Verifica se usuário está logado
         verifyLoggedUser()
     }
 
-    override fun onResume() {
-        binding.apply {
-            mViewModel.updateFields(editEmail.text.toString(), editPassword.text.toString())
-        }
-        super.onResume()
-    }
 
     override fun onDestroy() {
         _binding = null
         super.onDestroy()
     }
+
+//    private fun updateFields() {
+//        binding.apply {
+//            mViewModel.updateFields(editEmail.text.toString(), editPassword.text.toString())
+//        }
+//    }
 
     /**
      * Inicializa os eventos de click
@@ -77,30 +81,29 @@ class LoginActivity : AppCompatActivity() {
     /**
      * Coleta dados do ViewModel
      */
-    private fun collector() = lifecycleScope.launch {
-        repeatOnLifecycle(Lifecycle.State.STARTED) {
-            mViewModel.login.collectLatest {
-                when (it) {
-                    is ResourceState.Sucess -> {
-                        startActivity(Intent(this@LoginActivity, MainActivity::class.java))
-                        Timber.tag("LoginActivity").i("Login feito com sucesso!")
-                        finish()
-                    }
-                    else -> {
-                        mViewModel.toast.collect { message ->
-                            Toast.makeText(this@LoginActivity, message, Toast.LENGTH_SHORT).show()
-                        }
+    private fun collector() {
+        collectLatestStateFlow(mViewModel.login) {
+            when (it) {
+                is ResourceState.Sucess -> {
+                    startActivity(Intent(this@LoginActivity, MainActivity::class.java))
+                    Timber.tag("LoginActivity").i("Login feito com sucesso!")
+                    finish()
+                }
+                else -> {
+                    mViewModel.toast.collect { message ->
+                        Toast.makeText(this@LoginActivity, message, Toast.LENGTH_SHORT).show()
                     }
                 }
             }
-
-            mViewModel.email.collectLatest {
-                binding.editEmail.setText(it)
-            }
-            mViewModel.password.collectLatest {
-                binding.editPassword.setText(it)
-            }
         }
+
+//        collectLatestStateFlow(mViewModel.email) {
+//            binding.editEmail.setText(it)
+//        }
+//        collectLatestStateFlow(mViewModel.password) {
+//            binding.editPassword.setText(it)
+//        }
+
     }
 
     /**
@@ -111,5 +114,6 @@ class LoginActivity : AppCompatActivity() {
         val password = binding.editPassword.text.toString()
         mViewModel.doLogin(email, password)
     }
+
 
 }

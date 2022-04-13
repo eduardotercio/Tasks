@@ -10,7 +10,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.tasks.R
-import com.example.tasks.constants.TaskConstants
+import com.example.tasks.util.constants.TaskConstants
 import com.example.tasks.data.listener.TaskListener
 import com.example.tasks.ui.view.adapter.TaskAdapter
 import com.example.tasks.ui.viewmodel.AllTasksViewModel
@@ -52,7 +52,7 @@ class AllTasksFragment : Fragment() {
         }
 
         // Cria os observadores
-        observe()
+        collector()
 
         // Retorna view
         return root
@@ -63,6 +63,8 @@ class AllTasksFragment : Fragment() {
         mAdapter.attachListener(mListener)
     }
 
-    private fun observe() {}
+    private fun collector() {
+
+    }
 
 }

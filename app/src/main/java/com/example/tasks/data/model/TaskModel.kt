@@ -8,7 +8,7 @@ data class TaskModel(
     @SerializedName("Id")
     val id: Int,
 
-    @SerializedName("PriorityID")
+    @SerializedName("PriorityId")
     val priorityId: Int,
 
     @SerializedName("Description")

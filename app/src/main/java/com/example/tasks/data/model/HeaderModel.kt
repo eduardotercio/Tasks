@@ -1,6 +1,7 @@
 package com.example.tasks.data.model
 
 import com.google.gson.annotations.SerializedName
+import dagger.Provides
 import java.io.Serializable
 
 /**

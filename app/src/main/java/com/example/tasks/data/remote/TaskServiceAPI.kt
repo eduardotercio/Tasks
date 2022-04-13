@@ -21,7 +21,7 @@ interface TaskServiceAPI {
     @POST("Task")
     @FormUrlEncoded
     suspend fun insert(
-        @Field("PriorityID") priorityId: Int,
+        @Field("PriorityId") priorityId: Int,
         @Field("Description") description: String,
         @Field("DueDate") dueDate: String,
         @Field("Complete") complete: Boolean

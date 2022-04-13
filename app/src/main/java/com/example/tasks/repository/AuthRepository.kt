@@ -1,7 +1,7 @@
 package com.example.tasks.repository
 
 import android.content.SharedPreferences
-import com.example.tasks.constants.TaskConstants.SHARED
+import com.example.tasks.util.constants.TaskConstants.SHARED
 import com.example.tasks.data.model.HeaderModel
 import com.example.tasks.data.remote.AuthServiceAPI
 import com.example.tasks.ui.state.ResourceState
@@ -51,16 +51,15 @@ class AuthRepository @Inject constructor(
     // Se Não estiver logado, salva os dados retornados da API no shared,
     // para usar como Header posteriormente
     private fun save(response: Response<HeaderModel>) {
-        if (!isLogged()) {
-            response.body()?.let { header ->
-                shared.edit().putString(SHARED.TOKEN_KEY, header.token).apply()
-                shared.edit().putString(SHARED.PERSON_KEY, header.personKey).apply()
-                shared.edit().putString(SHARED.PERSON_NAME, header.name).apply()
-            }
+        response.body()?.let { header ->
+            shared.edit().putString(SHARED.TOKEN_KEY, header.token).apply()
+            shared.edit().putString(SHARED.PERSON_KEY, header.personKey).apply()
+            shared.edit().putString(SHARED.PERSON_NAME, header.name).apply()
         }
+
     }
 
-    // Chamada para deletar os dados do Header, assim deslogando o usuário
+    // Chamada para deletar os dados do Header quando deslogamos o usuário
     fun delete() {
         shared.edit().remove(SHARED.TOKEN_KEY).apply()
         shared.edit().remove(SHARED.PERSON_KEY).apply()
