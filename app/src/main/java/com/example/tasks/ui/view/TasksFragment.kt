@@ -14,17 +14,17 @@ import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.example.tasks.R
-import com.example.tasks.util.constants.TaskConstants
+import com.example.tasks.util.constants.TaskConstants.BUNDLE
 import com.example.tasks.databinding.FragmentAllTasksBinding
 import com.example.tasks.ui.state.ResourceState
 import com.example.tasks.ui.view.adapter.TaskAdapter
-import com.example.tasks.ui.viewmodel.AllTasksViewModel
+import com.example.tasks.ui.viewmodel.TasksViewModel
 import com.example.tasks.util.collectLatestStateFlow
 import com.example.tasks.util.network.NetworkCheck
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class AllTasksFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
+class TasksFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
     private val networkCheck by lazy {
         NetworkCheck(
@@ -34,7 +34,7 @@ class AllTasksFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
             ), requireContext()
         )
     }
-    private val mViewModel: AllTasksViewModel by viewModels()
+    private val mViewModel: TasksViewModel by viewModels()
     private val mAdapter by lazy { TaskAdapter() }
 
     private var _binding: FragmentAllTasksBinding? = null
@@ -66,8 +66,12 @@ class AllTasksFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         super.onDestroyView()
     }
 
+    private fun argument(): Int {
+        return arguments!!.getInt(BUNDLE.TASKFILTER)
+    }
+
     private fun update() {
-        mViewModel.list()
+        mViewModel.list(argument())
     }
 
     private fun collector() {
@@ -99,7 +103,7 @@ class AllTasksFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         collectLatestStateFlow(mViewModel.check) { resource ->
             when (resource) {
                 is ResourceState.Sucess -> {
-                    mViewModel.list()
+                    mViewModel.list(argument())
                 }
                 is ResourceState.Error -> {
                     Toast.makeText(context, "Erro ao atualizar tarefa.", Toast.LENGTH_SHORT).show()
@@ -111,7 +115,7 @@ class AllTasksFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         collectLatestStateFlow(mViewModel.delete) { resource ->
             when (resource) {
                 is ResourceState.Sucess -> {
-                    mViewModel.list()
+                    mViewModel.list(argument())
                 }
                 is ResourceState.Error -> {
                     Toast.makeText(context, "Erro ao deletar tarefa.", Toast.LENGTH_SHORT).show()
@@ -134,7 +138,7 @@ class AllTasksFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
                 networkCheck.doIfConnected {
                     val intent = Intent(context, TaskFormActivity::class.java)
                     val bundle = Bundle()
-                    bundle.putInt(TaskConstants.BUNDLE.TASKID, task.id)
+                    bundle.putInt(BUNDLE.TASKID, task.id)
                     intent.putExtras(bundle)
                     startActivity(intent)
                 }

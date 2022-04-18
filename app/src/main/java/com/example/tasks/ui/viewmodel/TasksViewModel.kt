@@ -1,6 +1,5 @@
 package com.example.tasks.ui.viewmodel
 
-import android.app.Application
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -19,7 +18,7 @@ import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @HiltViewModel
-class AllTasksViewModel @Inject constructor(
+class TasksViewModel @Inject constructor(
     private val taskRepository: TaskRepository,
     private val priorityRepository: PriorityRepository
 ) : ViewModel() {
@@ -53,13 +52,22 @@ class AllTasksViewModel @Inject constructor(
 
     /**
      * GET*/
-    fun list() {
+    fun list(taskFilter: Int) {
         viewModelScope.launch {
             MainScope().launch {
                 withContext(Dispatchers.Default) {
                     try {
-                        val response = taskRepository.list()
-                        mTask.value = convert(response)
+                        when (taskFilter) {
+                            0 -> {
+                                mTask.value = convert(taskRepository.list())
+                            }
+                            1 -> {
+                                mTask.value = convert(taskRepository.listNextWeek())
+                            }
+                            else -> {
+                                mTask.value = convert(taskRepository.listOverdue())
+                            }
+                        }
                     } catch (t: Throwable) {
                         mTask.value = ResourceState.Error(t.message)
                         Log.e("ErrorAllTasksVM", t.message.toString())

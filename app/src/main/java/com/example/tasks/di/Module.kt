@@ -44,15 +44,6 @@ object Module {
         @ApplicationContext context: Context
     ): SharedPreferences = context.getSharedPreferences("taskShared", Context.MODE_PRIVATE)
 
-    // Dependências para o Retrofit e requisições API
-//    @Qualifier
-//    @Retention(AnnotationRetention.BINARY)
-//    annotation class AuthInterceptorOkHttpClient
-//
-//    @Qualifier
-//    @Retention(AnnotationRetention.BINARY)
-//    annotation class OtherInterceptorOkHttpClient
-
     @Singleton
     @Provides
     fun provideOkHttpClient(

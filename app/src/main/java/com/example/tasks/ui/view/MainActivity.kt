@@ -2,8 +2,9 @@ package com.example.tasks.ui.view
 
 import android.content.Intent
 import android.os.Bundle
+import android.widget.TextView
+import androidx.activity.viewModels
 import com.google.android.material.floatingactionbutton.FloatingActionButton
-import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.navigation.NavigationView
 import androidx.navigation.findNavController
 import androidx.drawerlayout.widget.DrawerLayout
@@ -15,13 +16,14 @@ import androidx.navigation.ui.*
 import com.example.tasks.R
 import com.example.tasks.databinding.ActivityMainBinding
 import com.example.tasks.ui.viewmodel.MainViewModel
+import com.example.tasks.util.collectLatestStateFlow
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
 
     private lateinit var appBarConfiguration: AppBarConfiguration
-    private lateinit var mViewModel: MainViewModel
+    private val mViewModel: MainViewModel by viewModels()
 
     private var _binding: ActivityMainBinding? = null
     private val binding get() = _binding!!
@@ -30,10 +32,6 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         _binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
-        mViewModel = ViewModelProvider(this).get(MainViewModel::class.java)
-
-        binding.drawerLayout
 
         val toolbar: Toolbar = findViewById(R.id.toolbar)
         setSupportActionBar(toolbar)
@@ -47,11 +45,17 @@ class MainActivity : AppCompatActivity() {
         setupNavigation()
 
         // Observadores
-        observe()
+        collect()
+    }
+
+    override fun onDestroy() {
+        _binding = null
+        super.onDestroy()
     }
 
     override fun onResume() {
         super.onResume()
+        mViewModel.name()
     }
 
     override fun onSupportNavigateUp(): Boolean {
@@ -78,14 +82,17 @@ class MainActivity : AppCompatActivity() {
                 finish()
             } else {
                 NavigationUI.onNavDestinationSelected(it, navController)
-                drawerLayout.closeDrawer(GravityCompat.END)
+                drawerLayout.closeDrawer(GravityCompat.START)
             }
             true
         }
     }
 
-    private fun observe() {
-
+    private fun collect() {
+        collectLatestStateFlow(mViewModel.name) {
+            val header = binding.navView.getHeaderView(0)
+            header.findViewById<TextView>(R.id.text_name).text = it
+        }
     }
 
 }
