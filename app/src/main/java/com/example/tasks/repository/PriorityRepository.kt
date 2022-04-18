@@ -1,11 +1,11 @@
 package com.example.tasks.repository
 
 import com.example.tasks.data.local.PriorityDAO
-import com.example.tasks.data.model.PriorityModel
 import com.example.tasks.data.remote.PrioritySerivceAPI
-import com.example.tasks.ui.state.ResourceState
-import com.google.gson.Gson
-import retrofit2.Response
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 class PriorityRepository @Inject constructor(
@@ -13,7 +13,7 @@ class PriorityRepository @Inject constructor(
     private val daoPriority: PriorityDAO
 ) {
 
-    suspend fun setPriorityList() {
+    suspend fun setPriorityList() = withContext(Dispatchers.IO) {
         val response = apiPriority.priorityList()
         if (response.isSuccessful) {
             daoPriority.clear()
@@ -22,5 +22,7 @@ class PriorityRepository @Inject constructor(
     }
 
     suspend fun list() = daoPriority.list()
+
+    suspend fun priority(id: Int) = daoPriority.priority(id)
 
 }

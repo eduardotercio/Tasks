@@ -82,8 +82,8 @@ class LoginActivity : AppCompatActivity() {
      * Coleta dados do ViewModel
      */
     private fun collector() {
-        collectLatestStateFlow(mViewModel.login) {
-            when (it) {
+        collectLatestStateFlow(mViewModel.login) { resource ->
+            when (resource) {
                 is ResourceState.Sucess -> {
                     startActivity(Intent(this@LoginActivity, MainActivity::class.java))
                     Timber.tag("LoginActivity").i("Login feito com sucesso!")

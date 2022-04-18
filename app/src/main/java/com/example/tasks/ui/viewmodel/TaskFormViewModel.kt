@@ -2,11 +2,10 @@ package com.example.tasks.ui.viewmodel
 
 import android.app.Application
 import android.util.Log
-import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.tasks.data.model.PriorityModel
-import com.example.tasks.data.model.TaskModel
+import com.example.tasks.data.model.TaskModelResponse
 import com.example.tasks.repository.PriorityRepository
 import com.example.tasks.repository.TaskRepository
 import com.example.tasks.ui.state.ResourceState
@@ -27,6 +26,9 @@ class TaskFormViewModel @Inject constructor(
     private val mSave = MutableStateFlow<ResourceState<Response<Boolean>>>(ResourceState.Empty())
     val save = mSave.asStateFlow()
 
+    private val mUpdate = MutableStateFlow<ResourceState<Boolean>>(ResourceState.Empty())
+    val update = mUpdate.asStateFlow()
+
     private val mListPriority = MutableStateFlow<List<PriorityModel>>(arrayListOf())
     val listPriority = mListPriority.asStateFlow()
 
@@ -35,6 +37,9 @@ class TaskFormViewModel @Inject constructor(
 
     private val mDate = MutableStateFlow<String>("")
     val date = mDate.asStateFlow()
+
+    private val mTask = MutableStateFlow<ResourceState<TaskModelResponse>>(ResourceState.Empty())
+    val task = mTask.asStateFlow()
 
 
     fun setSpinner() {
@@ -51,10 +56,24 @@ class TaskFormViewModel @Inject constructor(
         mPriority.value = id
     }
 
-    fun saveTask(task: TaskModel) {
+    fun saveTask(task: TaskModelResponse) {
         viewModelScope.launch {
             try {
-                mSave.value = taskRepository.save(task)
+                if(task.id == 0) {
+                    mSave.value = taskRepository.save(task)
+                } else {
+                    mUpdate.value = taskRepository.update(task)
+                }
+            } catch (t: Throwable) {
+                Log.e("ErrorTaskFormVM", t.message.toString())
+            }
+        }
+    }
+
+    fun load(taskId: Int) {
+        viewModelScope.launch {
+            try {
+                mTask.value = taskRepository.task(taskId)
             } catch (t: Throwable) {
                 Log.e("ErrorTaskFormVM", t.message.toString())
             }

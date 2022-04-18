@@ -3,7 +3,7 @@ package com.example.tasks.data.model
 import com.google.gson.annotations.SerializedName
 import java.io.Serializable
 
-data class TaskModel(
+data class TaskModelResponse(
 
     @SerializedName("Id")
     val id: Int,

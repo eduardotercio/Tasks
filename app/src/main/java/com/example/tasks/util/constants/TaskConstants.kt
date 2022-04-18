@@ -23,6 +23,12 @@ class TaskConstants private constructor() {
         const val PERSON_KEY = "personKey"
     }
 
+    object SEARCH {
+        const val ALL = "all"
+        const val NEXT_WEEK = "nextWeak"
+        const val OVERDUE = "overdue"
+    }
+
     object HTTP {
         const val SUCCESS = 200
     }

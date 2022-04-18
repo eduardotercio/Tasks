@@ -5,17 +5,13 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.tasks.data.model.HeaderModel
-import com.example.tasks.data.model.PriorityModel
 import com.example.tasks.repository.AuthRepository
 import com.example.tasks.repository.PriorityRepository
 import com.example.tasks.ui.state.ResourceState
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import retrofit2.Response
-import java.io.IOException
 import javax.inject.Inject
 
 
@@ -30,9 +26,9 @@ class LoginViewModel @Inject constructor(
         MutableStateFlow<ResourceState<Response<HeaderModel>>>(ResourceState.Empty())
     val login = mLogin.asStateFlow()
 
-    private val mPriorityList =
-        MutableStateFlow<ResourceState<Response<List<PriorityModel>>>>(ResourceState.Empty())
-    val priorityList = mPriorityList.asStateFlow()
+//    private val mPriorityList =
+//        MutableStateFlow<ResourceState<Response<List<PriorityModel>>>>(ResourceState.Empty())
+//    val priorityList = mPriorityList.asStateFlow()
 
 //    private val mEmail = MutableStateFlow<String>("")
 //    val email = mEmail.asStateFlow()

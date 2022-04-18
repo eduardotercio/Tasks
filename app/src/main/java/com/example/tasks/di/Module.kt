@@ -5,8 +5,6 @@ import android.content.SharedPreferences
 import androidx.room.Room
 import com.example.tasks.util.constants.TaskConstants.DATABASE.DATABASE_NAME
 import com.example.tasks.data.local.AppDatabase
-import com.example.tasks.data.model.HeaderModel
-import com.example.tasks.data.model.TaskModel
 import com.example.tasks.data.remote.AuthServiceAPI
 import com.example.tasks.data.remote.PrioritySerivceAPI
 import com.example.tasks.data.remote.TaskServiceAPI
@@ -22,7 +20,6 @@ import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import javax.inject.Qualifier
 import javax.inject.Singleton
 
 @Module
