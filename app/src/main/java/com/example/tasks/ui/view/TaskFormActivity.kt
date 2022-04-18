@@ -1,6 +1,7 @@
 package com.example.tasks.ui.view
 
 import android.app.DatePickerDialog
+import android.net.ConnectivityManager
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
@@ -9,6 +10,7 @@ import android.widget.ArrayAdapter
 import android.widget.DatePicker
 import android.widget.Toast
 import androidx.activity.viewModels
+import androidx.core.content.ContextCompat
 import com.example.tasks.R
 import com.example.tasks.data.model.TaskModelResponse
 import com.example.tasks.databinding.ActivityTaskFormBinding
@@ -16,12 +18,17 @@ import com.example.tasks.ui.state.ResourceState
 import com.example.tasks.ui.viewmodel.TaskFormViewModel
 import com.example.tasks.util.collectLatestStateFlow
 import com.example.tasks.util.constants.TaskConstants
+import com.example.tasks.util.network.NetworkCheck
 import dagger.hilt.android.AndroidEntryPoint
 import java.text.SimpleDateFormat
 import java.util.*
 
 @AndroidEntryPoint
 class TaskFormActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener {
+
+    private val networkCheck by lazy {
+        NetworkCheck(ContextCompat.getSystemService(this, ConnectivityManager::class.java), this)
+    }
 
     private val mViewModel: TaskFormViewModel by viewModels()
 
@@ -47,6 +54,8 @@ class TaskFormActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener
 
         // Inicializar os clicks
         setClickListeners()
+
+
     }
 
     override fun onDestroy() {
@@ -156,7 +165,9 @@ class TaskFormActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener
                 datePickerDialog().show()
             }
             buttonSave.setOnClickListener {
-                handleSave()
+                networkCheck.doIfConnected {
+                    handleSave()
+                }
             }
             spinnerPriority.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
                 override fun onItemSelected(

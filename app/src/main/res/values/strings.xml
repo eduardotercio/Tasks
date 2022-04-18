@@ -32,5 +32,6 @@
     <string name="expiradas">Expiradas</string>
     <string name="all_tasks">Tarefas</string>
     <string name="proximos_7_dias">Próximos 7 dias</string>
+    <string name="menu_refresh">Atualizar</string>
 
 </resources>

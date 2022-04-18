@@ -1,9 +1,12 @@
 package com.example.tasks.ui.view
 
 import android.content.Intent
+import android.net.ConnectivityManager
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Toast
+import androidx.activity.viewModels
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
@@ -12,6 +15,7 @@ import com.example.tasks.databinding.ActivityLoginBinding
 import com.example.tasks.ui.state.ResourceState
 import com.example.tasks.ui.viewmodel.LoginViewModel
 import com.example.tasks.util.collectLatestStateFlow
+import com.example.tasks.util.network.NetworkCheck
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.collectLatest
@@ -21,7 +25,10 @@ import timber.log.Timber
 @AndroidEntryPoint
 class LoginActivity : AppCompatActivity() {
 
-    private lateinit var mViewModel: LoginViewModel
+    private val mViewModel: LoginViewModel by viewModels()
+    private val networkCheck by lazy {
+        NetworkCheck(ContextCompat.getSystemService(this, ConnectivityManager::class.java), this)
+    }
 
     private var _binding: ActivityLoginBinding? = null
     private val binding get() = _binding!!
@@ -31,14 +38,9 @@ class LoginActivity : AppCompatActivity() {
         _binding = ActivityLoginBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        mViewModel = ViewModelProvider(this).get(LoginViewModel::class.java)
-
         // Inicializa eventos
         collector()
         setClickListeners();
-
-        // Mantém os dados dos campos
-        //updateFields()
 
         // Verifica se usuário está logado
         verifyLoggedUser()
@@ -50,18 +52,14 @@ class LoginActivity : AppCompatActivity() {
         super.onDestroy()
     }
 
-//    private fun updateFields() {
-//        binding.apply {
-//            mViewModel.updateFields(editEmail.text.toString(), editPassword.text.toString())
-//        }
-//    }
-
     /**
      * Inicializa os eventos de click
      */
     private fun setClickListeners() {
         binding.buttonLogin.setOnClickListener {
-            handleLogin()
+            networkCheck.doIfConnected {
+                handleLogin()
+            }
         }
         binding.textRegister.setOnClickListener {
             startActivity(Intent(this, RegisterActivity::class.java))
@@ -96,13 +94,6 @@ class LoginActivity : AppCompatActivity() {
                 }
             }
         }
-
-//        collectLatestStateFlow(mViewModel.email) {
-//            binding.editEmail.setText(it)
-//        }
-//        collectLatestStateFlow(mViewModel.password) {
-//            binding.editPassword.setText(it)
-//        }
 
     }
 

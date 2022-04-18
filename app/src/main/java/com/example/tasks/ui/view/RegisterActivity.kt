@@ -1,9 +1,12 @@
 package com.example.tasks.ui.view
 
 import android.content.Intent
+import android.net.ConnectivityManager
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Toast
+import androidx.activity.viewModels
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
@@ -11,6 +14,7 @@ import androidx.lifecycle.repeatOnLifecycle
 import com.example.tasks.databinding.ActivityRegisterBinding
 import com.example.tasks.ui.state.ResourceState
 import com.example.tasks.ui.viewmodel.RegisterViewModel
+import com.example.tasks.util.network.NetworkCheck
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -18,7 +22,12 @@ import kotlinx.coroutines.launch
 @AndroidEntryPoint
 class RegisterActivity : AppCompatActivity() {
 
-    private lateinit var mViewModel: RegisterViewModel
+    private val networkCheck by lazy {
+        NetworkCheck(ContextCompat.getSystemService(this, ConnectivityManager::class.java), this)
+    }
+
+    private val mViewModel: RegisterViewModel by viewModels()
+
 
     private var _binding: ActivityRegisterBinding? = null
     private val binding get() = _binding!!
@@ -27,8 +36,6 @@ class RegisterActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         _binding = ActivityRegisterBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
-        mViewModel = ViewModelProvider(this).get(RegisterViewModel::class.java)
 
         // Inicializa eventos
         collector()
@@ -60,11 +67,13 @@ class RegisterActivity : AppCompatActivity() {
     private fun setClickListeners() {
         binding.apply {
             buttonSave.setOnClickListener {
-                val name = editName.text.toString()
-                val email = editEmail.text.toString()
-                val password = editPassword.text.toString()
+                networkCheck.doIfConnected {
+                    val name = editName.text.toString()
+                    val email = editEmail.text.toString()
+                    val password = editPassword.text.toString()
 
-                mViewModel.create(name, email, password)
+                    mViewModel.create(name, email, password)
+                }
             }
         }
     }

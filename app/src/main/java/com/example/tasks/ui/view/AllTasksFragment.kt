@@ -2,14 +2,17 @@ package com.example.tasks.ui.view
 
 import android.app.AlertDialog
 import android.content.Intent
+import android.net.ConnectivityManager
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.example.tasks.R
 import com.example.tasks.util.constants.TaskConstants
 import com.example.tasks.databinding.FragmentAllTasksBinding
@@ -17,11 +20,20 @@ import com.example.tasks.ui.state.ResourceState
 import com.example.tasks.ui.view.adapter.TaskAdapter
 import com.example.tasks.ui.viewmodel.AllTasksViewModel
 import com.example.tasks.util.collectLatestStateFlow
+import com.example.tasks.util.network.NetworkCheck
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class AllTasksFragment : Fragment() {
+class AllTasksFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
+    private val networkCheck by lazy {
+        NetworkCheck(
+            ContextCompat.getSystemService(
+                requireContext(),
+                ConnectivityManager::class.java
+            ), requireContext()
+        )
+    }
     private val mViewModel: AllTasksViewModel by viewModels()
     private val mAdapter by lazy { TaskAdapter() }
 
@@ -39,16 +51,23 @@ class AllTasksFragment : Fragment() {
         collector()
         setupRecycler()
         clickAdapter()
+        binding.swiperefresh.setOnRefreshListener {
+            update()
+        }
     }
 
     override fun onResume() {
         super.onResume()
-        mViewModel.list()
+        update()
     }
 
     override fun onDestroyView() {
         _binding = null
         super.onDestroyView()
+    }
+
+    private fun update() {
+        mViewModel.list()
     }
 
     private fun collector() {
@@ -62,13 +81,16 @@ class AllTasksFragment : Fragment() {
                             mAdapter.tasks = arrayListOf()
                         }
                     }
+                    binding.swiperefresh.isRefreshing = false
                 }
                 is ResourceState.Error -> {
+                    mAdapter.tasks = arrayListOf()
                     Toast.makeText(
                         requireContext(),
                         "Erro ao buscar as tarefas",
                         Toast.LENGTH_SHORT
                     ).show()
+                    binding.swiperefresh.isRefreshing = false
                 }
                 else -> {}
             }
@@ -109,15 +131,19 @@ class AllTasksFragment : Fragment() {
     private fun clickAdapter() {
         mAdapter.apply {
             setOnItemClickListener { task ->
-                val intent = Intent(context, TaskFormActivity::class.java)
-                val bundle = Bundle()
-                bundle.putInt(TaskConstants.BUNDLE.TASKID, task.id)
-                intent.putExtras(bundle)
-                startActivity(intent)
+                networkCheck.doIfConnected {
+                    val intent = Intent(context, TaskFormActivity::class.java)
+                    val bundle = Bundle()
+                    bundle.putInt(TaskConstants.BUNDLE.TASKID, task.id)
+                    intent.putExtras(bundle)
+                    startActivity(intent)
+                }
             }
 
             setOnCheckClickListener { task ->
-                mViewModel.check(task.id, task.complete)
+                networkCheck.doIfConnected {
+                    mViewModel.check(task.id, task.complete)
+                }
             }
 
             setOnLongClickListener { task ->
@@ -125,13 +151,16 @@ class AllTasksFragment : Fragment() {
                     .setTitle(R.string.remocao_de_tarefa)
                     .setMessage(R.string.remover_tarefa)
                     .setPositiveButton(R.string.sim) { dialog, which ->
-                        mViewModel.delete(task.id)
+                        networkCheck.doIfConnected {
+                            mViewModel.delete(task.id)
+                        }
                     }
                     .setNeutralButton(R.string.cancelar, null)
                     .show()
-                true
             }
         }
     }
+
+    override fun onRefresh() {}
 
 }

@@ -20,7 +20,6 @@ import javax.inject.Inject
 
 @HiltViewModel
 class AllTasksViewModel @Inject constructor(
-    application: Application,
     private val taskRepository: TaskRepository,
     private val priorityRepository: PriorityRepository
 ) : ViewModel() {
@@ -62,6 +61,7 @@ class AllTasksViewModel @Inject constructor(
                         val response = taskRepository.list()
                         mTask.value = convert(response)
                     } catch (t: Throwable) {
+                        mTask.value = ResourceState.Error(t.message)
                         Log.e("ErrorAllTasksVM", t.message.toString())
                     }
                 }
