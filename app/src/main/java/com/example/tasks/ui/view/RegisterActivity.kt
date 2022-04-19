@@ -28,7 +28,6 @@ class RegisterActivity : AppCompatActivity() {
 
     private val mViewModel: RegisterViewModel by viewModels()
 
-
     private var _binding: ActivityRegisterBinding? = null
     private val binding get() = _binding!!
 
